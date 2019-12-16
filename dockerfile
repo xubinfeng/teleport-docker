@@ -1,25 +1,34 @@
-FROM alpine
-# Dockerfile to run a self-hosted Syncthing discovery server (latest build).
-LABEL "Maintainer"="Xu.Binfeng <564001002@qq.com>"
-
-ENV  version '3.2.2'
+FROM lolhens/baseimage:latest
+MAINTAINER LolHens <pierrekisters@gmail.com>
 
 
-ADD teleport-server-linux-x64-${version}.tar.gz /
-RUN tar zxvf teleport-server-linux-x64-${version}.tar.gz \
-&& rm -f teleport-server-linux-x64-${version}.tar.gz \
-&& mv teleport-server-linux-x64-${version} teleport \
-&& cd /teleport \
-&& sh setup.sh >> install.log \
-&& /etc/init.d/teleport start
+ENV TELEPORT_VERSION 4.1.7
+ENV TELEPORT_NAME teleport
+ENV TELEPORT_FILE $TELEPORT_NAME-v$TELEPORT_VERSION-linux-amd64-bin.tar.gz
+ENV TELEPORT_URL https://github.com/gravitational/teleport/releases/download/v$TELEPORT_VERSION/$TELEPORT_FILE
+ENV TELEPORT_HOME /usr/local/teleport
+
+ENV TELEPORT_NODENAME node
 
 
+RUN apt-get update \
+ && apt-get install -y \
+      make \
+ && cd "/tmp" \
+ && curl -LO $TELEPORT_URL \
+ && tar -xf $TELEPORT_FILE \
+ && mv $TELEPORT_NAME $TELEPORT_HOME \
+ && cd $TELEPORT_HOME \
+ && make install \
+ && cleanimage
+
+RUN appfolders add "teleport" "/var/lib/teleport"
 
 
-WORKDIR /teleport
-
-EXPOSE 7190 52080 52089 52189
-
+WORKDIR $TELEPORT_HOME
+CMD teleport start --nodename=$TELEPORT_NODENAME
 
 
+VOLUME /usr/local/appdata/teleport
 
+EXPOSE 3022 3023 3024 3025 3080
