@@ -5,21 +5,18 @@ LABEL "Maintainer"="Xu.Binfeng <564001002@qq.com>"
 ENV  version '3.2.2'
 
 
-ADD v${version}.tar.gz /
-RUN tar zxvf v${version}.tar.gz \
-&& rm -f v${version}.tar.gz \
-&& cd /v${version} \
-&& sh setup.sh \
+ADD teleport-server-linux-x64-${version}.tar.gz /
+RUN tar zxvf teleport-server-linux-x64-${version}.tar.gz \
+&& rm -f teleport-server-linux-x64-${version}.tar.gz \
+&& mv teleport-server-linux-x64-${version} teleport \
+&& cd /teleport \
+&& sh setup.sh >> install.log \
+&& /etc/init.d/teleport start
 
 
-#ADD server.crt /key
-#ADD server.pem /key
-
-#RUN chown -R syncthing: /key && \
-#    chmod -R 400 /key/*
 
 
-WORKDIR /v${version}
+WORKDIR /teleport
 
 EXPOSE 7190 52080 52089 52189
 
