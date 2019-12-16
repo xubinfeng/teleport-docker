@@ -6,6 +6,8 @@ ENV VERSION  '3.2.2'
 
 ADD teleport-server-linux-x64-${VERSION}.tar.gz /
 
+VOLUME /usr/local/appdata/teleport
+
 
 RUN tar zxvf teleport-server-linux-x64-${VERSION}.tar.gz \
 && rm -f teleport-server-linux-x64-${VERSION}.tar.gz \
